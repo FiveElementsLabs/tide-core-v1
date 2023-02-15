@@ -7,15 +7,12 @@
     "test": "npx hardhat test"
   },
   "dependencies": {
-    "@chainlink/contracts": "^0.4.2",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.2",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.3",
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "ethers": "^5.6.9",
-    "graphql": "^16.5.0",
     "hardhat-gas-reporter": "^1.0.8",
-    "merkletreejs": "^0.2.32",
     "solidity-coverage": "^0.7.21"
   },
   "devDependencies": {
