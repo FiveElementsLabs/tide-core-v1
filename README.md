@@ -30,6 +30,4 @@ We are building the most innovative acquisition and retention mechanisms to chan
 You can see more on how Tide works by visiting our documentation:
 
 - [Tide Gitbook](https://fiveelementslabs.gitbook.io/tide/about-tide/web3-marketing-protocol)
-- [Smart Contracts Docs](https://tideprotocol.xyz)
-
-WIP: Documentation is being written.
+- [Smart Contracts Docs](https://fiveelementslabs.gitbook.io/tide/contracts/smart-contracts-overview)
