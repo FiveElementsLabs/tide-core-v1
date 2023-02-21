@@ -209,7 +209,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         }
     }
 
-    /// @dev override the transfer function to allow transfers only if isSoulbound is true
+    /// @dev override the transfer function to allow transfers only if not soulbound
     /// @param from The address to transfer from
     /// @param to The address to transfer to
     /// @param tokenId The token ID to transfer
