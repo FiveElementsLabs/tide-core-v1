@@ -49,29 +49,25 @@ const hardhat: HardhatUserConfig = {
     hardhat: {
       forking: {
         enabled: true,
-        url: process.env.ALCHEMY_POLYGON || "",
+        url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
         blockNumber: 15000000,
       },
     },
-    mumbai: {
-      url: process.env.ALCHEMY_MUMBAI || "",
-      accounts: [process.env.PVTKEY_MUMBAI || ""],
-    },
     polygon: {
-      url: process.env.ALCHEMY_POLYGON || "",
-      accounts: [process.env.PVTKEY_POLYGON || ""],
+      url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
+      accounts: [process.env.PVT_KEY || ""],
     },
     arbitrum: {
-      url: process.env.ALCHEMY_ARBITRUM || "",
-      accounts: [process.env.PVTKEY_ARBITRUM || ""],
+      url: `https://arb-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
+      accounts: [process.env.PVTKEY || ""],
     },
     mainnet: {
-      url: process.env.ALCHEMY_MAINNET || "",
-      accounts: [process.env.PVTKEY_MAINNET || ""],
+      url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+      accounts: [process.env.PVTKEY || ""],
     },
     optimism: {
-      url: process.env.ALCHEMY_OPTIMISM || "",
-      accounts: [process.env.PVTKEY_OPTIMISM || ""],
+      url: `https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
+      accounts: [process.env.PVTKEY || ""],
     },
   },
   etherscan: {
