@@ -24,10 +24,14 @@ contract WaveFactory is Ownable, IWaveFactory {
         verifier = _verifier;
     }
 
+    /// @dev changes the keeper associated with the factory
+    /// @param _keeper address of the new keeper
     function changeKeeper(address _keeper) public onlyOwner {
         keeper = _keeper;
     }
 
+    /// @dev changes the trusted forwarder for EIP-2771 meta transactions
+    /// @param _trustedForwarder address of the new trusted forwarder
     function changeTrustedForwarder(address _trustedForwarder)
         public
         onlyOwner
@@ -35,10 +39,19 @@ contract WaveFactory is Ownable, IWaveFactory {
         trustedForwarder = _trustedForwarder;
     }
 
+    /// @dev changes the verifier for EIP-712 signatures
+    /// @param _verifier address of the new verifier
     function changeVerifier(address _verifier) public onlyOwner {
         verifier = _verifier;
     }
 
+    /// @notice deploys a new campaign
+    /// @param _name name of the campaign
+    /// @param _symbol symbol of the campaign
+    /// @param _baseURI base URI of the ERC-721 metadata
+    /// @param _startTimestamp start timestamp of the campaign
+    /// @param _endTimestamp end timestamp of the campaign
+    /// @param _isTransferrable whether the wave badges will be transferrable
     function deployWave(
         string memory _name,
         string memory _symbol,
