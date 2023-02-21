@@ -17,7 +17,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
 
     string baseURI;
     bool public customMetadata;
-    bool public isTransferrable;
+    bool public isSoulbound;
     bytes32 public immutable DOMAIN_SEPARATOR;
     bytes32 public immutable PERMIT_TYPEHASH;
 
@@ -41,6 +41,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
     error CampaignNotActive();
     error RewardAlreadyClaimed();
     error PermitDeadlineExpired();
+    error NotTransferrable();
 
     event Claimed(
         address indexed user,
@@ -59,7 +60,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         string memory _baseURI,
         uint256 _startTimestamp,
         uint256 _endTimestamp,
-        bool _isTransferrable,
+        bool _isSoulbound,
         address _trustedForwarder
     ) ERC2771Context(_trustedForwarder) Ownable() ERC721(_name, _symbol) {
         if (_startTimestamp > _endTimestamp) revert InvalidTimings();
@@ -68,7 +69,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         baseURI = _baseURI;
         startTimestamp = _startTimestamp;
         endTimestamp = _endTimestamp;
-        isTransferrable = _isTransferrable;
+        isSoulbound = _isSoulbound;
 
         DOMAIN_SEPARATOR = _computeDomainSeparator();
         PERMIT_TYPEHASH = keccak256(
@@ -208,7 +209,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         }
     }
 
-    /// @dev override the transfer function to allow transfers only if isTransferrable is true
+    /// @dev override the transfer function to allow transfers only if isSoulbound is true
     /// @param from The address to transfer from
     /// @param to The address to transfer to
     /// @param tokenId The token ID to transfer
@@ -217,7 +218,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         address to,
         uint256 tokenId
     ) internal override {
-        require(isTransferrable, "Soulbound: transfer not allowed");
+        if (isSoulbound) revert NotTransferrable();
         super._transfer(from, to, tokenId);
     }
 

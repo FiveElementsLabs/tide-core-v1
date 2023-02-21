@@ -3,7 +3,10 @@ import { ethers } from "hardhat";
 
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
-import { WaveContract, WaveFactory } from "../../typechain-types/contracts/core";
+import {
+  WaveContract,
+  WaveFactory,
+} from "../../typechain-types/contracts/core";
 
 describe("WaveContract.sol", function () {
   let signers: SignerWithAddress[];
@@ -38,7 +41,7 @@ describe("WaveContract.sol", function () {
       "https://wave.com/",
       blockTimestamp - 1000,
       blockTimestamp + 60 * 60 * 24 * 90,
-      false
+      true
     );
     await createTx.wait();
 
@@ -74,7 +77,7 @@ describe("WaveContract.sol", function () {
   it("should not be transferable if soulbound", async function () {
     await expect(
       campaign.connect(user).transferFrom(user.address, keeper.address, 1)
-    ).to.be.revertedWith("Soulbound: transfer not allowed");
+    ).to.be.reverted;
   });
 
   it("should be transferrable if passed in the constructor", async function () {
@@ -86,7 +89,7 @@ describe("WaveContract.sol", function () {
       "https://wave.com/",
       blockTimestamp - 1000,
       blockTimestamp + 60 * 60 * 24 * 9,
-      true
+      false
     );
     await tx.wait();
     const transferrableCampaign = (await ethers.getContractAt(

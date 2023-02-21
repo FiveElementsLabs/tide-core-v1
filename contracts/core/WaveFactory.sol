@@ -51,14 +51,14 @@ contract WaveFactory is Ownable, IWaveFactory {
     /// @param _baseURI base URI of the ERC-721 metadata
     /// @param _startTimestamp start timestamp of the campaign
     /// @param _endTimestamp end timestamp of the campaign
-    /// @param _isTransferrable whether the wave badges will be transferrable
+    /// @param _isSoulbound whether the wave badges will be soulbound
     function deployWave(
         string memory _name,
         string memory _symbol,
         string memory _baseURI,
         uint256 _startTimestamp,
         uint256 _endTimestamp,
-        bool _isTransferrable
+        bool _isSoulbound
     ) public override {
         WaveContract wave = new WaveContract(
             _name,
@@ -66,7 +66,7 @@ contract WaveFactory is Ownable, IWaveFactory {
             _baseURI,
             _startTimestamp,
             _endTimestamp,
-            _isTransferrable,
+            _isSoulbound,
             trustedForwarder
         );
 

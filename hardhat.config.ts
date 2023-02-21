@@ -55,7 +55,7 @@ const hardhat: HardhatUserConfig = {
     },
     polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
-      accounts: [process.env.PVT_KEY || ""],
+      accounts: [process.env.PVTKEY || ""],
     },
     arbitrum: {
       url: `https://arb-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,

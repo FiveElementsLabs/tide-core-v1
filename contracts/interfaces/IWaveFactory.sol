@@ -9,7 +9,7 @@ interface IWaveFactory {
         string memory _baseURI,
         uint256 _startTimestamp,
         uint256 _endTimestamp,
-        bool _isTransferrable
+        bool _isSoulbound
     ) external;
 
     function keeper() external view returns (address);
