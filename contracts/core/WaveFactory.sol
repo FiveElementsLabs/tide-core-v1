@@ -44,7 +44,8 @@ contract WaveFactory is Ownable, IWaveFactory {
         string memory _symbol,
         string memory _baseURI,
         uint256 _startTimestamp,
-        uint256 _endTimestamp
+        uint256 _endTimestamp,
+        bool _isTransferrable
     ) public override {
         WaveContract wave = new WaveContract(
             _name,
@@ -52,6 +53,7 @@ contract WaveFactory is Ownable, IWaveFactory {
             _baseURI,
             _startTimestamp,
             _endTimestamp,
+            _isTransferrable,
             trustedForwarder
         );
 

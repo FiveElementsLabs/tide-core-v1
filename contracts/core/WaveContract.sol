@@ -17,6 +17,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
 
     string baseURI;
     bool public customMetadata;
+    bool public isTransferrable;
     bytes32 public immutable DOMAIN_SEPARATOR;
     bytes32 public immutable PERMIT_TYPEHASH;
 
@@ -58,6 +59,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         string memory _baseURI,
         uint256 _startTimestamp,
         uint256 _endTimestamp,
+        bool _isTransferrable,
         address _trustedForwarder
     ) ERC2771Context(_trustedForwarder) Ownable() ERC721(_name, _symbol) {
         if (_startTimestamp > _endTimestamp) revert InvalidTimings();
@@ -66,6 +68,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         baseURI = _baseURI;
         startTimestamp = _startTimestamp;
         endTimestamp = _endTimestamp;
+        isTransferrable = _isTransferrable;
 
         DOMAIN_SEPARATOR = _computeDomainSeparator();
         PERMIT_TYPEHASH = keccak256(
@@ -183,6 +186,15 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         for (uint256 i = 0; i < winnerIds.length; i++) {
             tokenIdToRewardId[winnerIds[i]] = rewardId;
         }
+    }
+
+    function _transfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
+        require(isTransferrable, "Soulbound: transfer not allowed");
+        super._transfer(from, to, tokenId);
     }
 
     function _mintReward(address user, uint256 rewardId) internal {

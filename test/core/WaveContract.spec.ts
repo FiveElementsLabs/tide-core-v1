@@ -20,7 +20,7 @@ describe("WaveContract.sol", function () {
     user = signers[2];
 
     const factoryFactory = await ethers.getContractFactory(
-      "contracts/claim-with-permit/WaveFactory.sol:WaveFactory"
+      "contracts/core/WaveFactory.sol:WaveFactory"
     );
 
     factory = (await factoryFactory.deploy(
@@ -37,12 +37,13 @@ describe("WaveContract.sol", function () {
       "WAVE",
       "https://wave.com/",
       blockTimestamp - 1000,
-      blockTimestamp + 60 * 60 * 24 * 90
+      blockTimestamp + 60 * 60 * 24 * 90,
+      true
     );
     await createTx.wait();
 
     campaign = (await ethers.getContractAt(
-      "contracts/claim-with-permit/WaveContract.sol:WaveContract",
+      "contracts/core/WaveContract.sol:WaveContract",
       await factory.waves(0)
     )) as WaveContract;
   });
