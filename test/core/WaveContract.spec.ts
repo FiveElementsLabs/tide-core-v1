@@ -38,7 +38,7 @@ describe("WaveContract.sol", function () {
       "https://wave.com/",
       blockTimestamp - 1000,
       blockTimestamp + 60 * 60 * 24 * 90,
-      true
+      false
     );
     await createTx.wait();
 
@@ -68,6 +68,58 @@ describe("WaveContract.sol", function () {
     await tx.wait();
 
     const balance = await campaign.balanceOf(user.address);
+    expect(balance).to.equal(1);
+  });
+
+  it("should not be transferable if soulbound", async function () {
+    await expect(
+      campaign.connect(user).transferFrom(user.address, keeper.address, 1)
+    ).to.be.revertedWith("Soulbound: transfer not allowed");
+  });
+
+  it("should be transferrable if passed in the constructor", async function () {
+    const blockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
+
+    const tx = await factory.deployWave(
+      "Wave",
+      "WAVE",
+      "https://wave.com/",
+      blockTimestamp - 1000,
+      blockTimestamp + 60 * 60 * 24 * 9,
+      true
+    );
+    await tx.wait();
+    const transferrableCampaign = (await ethers.getContractAt(
+      "contracts/core/WaveContract.sol:WaveContract",
+      await factory.waves(1)
+    )) as WaveContract;
+
+    const spender = user.address;
+    const rewardId = 116;
+    const deadline = blockTimestamp + 6000;
+
+    const digest = await transferrableCampaign.getTypedDataHash({
+      spender,
+      rewardId,
+      deadline,
+    });
+
+    const signatureString = await verifier.signMessage(
+      ethers.utils.arrayify(digest)
+    );
+    const { v, r, s } = ethers.utils.splitSignature(signatureString);
+
+    const claimTx = await transferrableCampaign
+      .connect(user)
+      .claim(rewardId, deadline, v, r, s);
+    await claimTx.wait();
+
+    const transferTx = await transferrableCampaign
+      .connect(user)
+      .transferFrom(user.address, keeper.address, 1);
+    await transferTx.wait();
+
+    const balance = await transferrableCampaign.balanceOf(keeper.address);
     expect(balance).to.equal(1);
   });
 });
