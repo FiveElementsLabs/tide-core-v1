@@ -22,7 +22,7 @@ async function main() {
   // Wave info
   const name = "Campaign Name";
   const symbol = "SYM";
-  const baseURI = "";
+  const baseURI = "https://example.com/";
   const beginTimestamp = 1561534220;
   const endTimestamp = 2771936220;
 
@@ -36,7 +36,7 @@ async function main() {
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
   const WaveFactory = (await ethers.getContractAt(
-    "contracts/claim-with-permit/WaveFactory.sol:WaveFactory",
+    "contracts/core/WaveFactory.sol:WaveFactory",
     factoryAddress,
     signer
   )) as WaveFactory;
@@ -46,7 +46,8 @@ async function main() {
     symbol,
     baseURI,
     beginTimestamp,
-    endTimestamp
+    endTimestamp,
+    false
   );
   await deployWaveTx.wait();
   await new Promise((resolve) => setTimeout(resolve, 5000));
