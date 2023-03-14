@@ -17,6 +17,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
 
     string baseURI;
     bool public customMetadata;
+    bool public isSoulbound;
     bytes32 public immutable DOMAIN_SEPARATOR;
     bytes32 public immutable PERMIT_TYPEHASH;
 
@@ -40,6 +41,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
     error CampaignNotActive();
     error RewardAlreadyClaimed();
     error PermitDeadlineExpired();
+    error NotTransferrable();
 
     event Claimed(
         address indexed user,
@@ -58,6 +60,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         string memory _baseURI,
         uint256 _startTimestamp,
         uint256 _endTimestamp,
+        bool _isSoulbound,
         address _trustedForwarder
     ) ERC2771Context(_trustedForwarder) Ownable() ERC721(_name, _symbol) {
         if (_startTimestamp > _endTimestamp) revert InvalidTimings();
@@ -66,6 +69,7 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         baseURI = _baseURI;
         startTimestamp = _startTimestamp;
         endTimestamp = _endTimestamp;
+        isSoulbound = _isSoulbound;
 
         DOMAIN_SEPARATOR = _computeDomainSeparator();
         PERMIT_TYPEHASH = keccak256(
@@ -73,6 +77,9 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         );
     }
 
+    /// @notice Allows the owner to set metadata base URI for all tokens
+    /// @param _baseURI The base URI to set
+    /// @param _customMetadata Whether the metadata is encoded with rewardId or tokenId
     function changeBaseURI(string memory _baseURI, bool _customMetadata)
         public
         onlyKeeper
@@ -81,6 +88,9 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         customMetadata = _customMetadata;
     }
 
+    /// @notice Allows the owner to set the timings for the campaign
+    /// @param _startTimestamp The timestamp from which users can claim
+    /// @param _endTimestamp The timestamp until which users can claim
     function changeTimings(uint256 _startTimestamp, uint256 _endTimestamp)
         public
         onlyOwner
@@ -90,8 +100,13 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         endTimestamp = _endTimestamp;
     }
 
-    // Execute the mint with permit by verifying the off-chain verifier signature.
-    // Also works with gasless EIP-2612 forwarders
+    /// @notice Execute the mint with permit by verifying the off-chain verifier signature.
+    /// @dev Also works with gasless EIP-2612 forwarders
+    /// @param rewardId The rewardId to mint
+    /// @param deadline The deadline for the permit
+    /// @param v The v component of the signature
+    /// @param r The r component of the signature
+    /// @param s The s component of the signature
     function claim(
         uint256 rewardId,
         uint256 deadline,
@@ -118,7 +133,9 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         _mintReward(_msgSender(), rewardId);
     }
 
-    // computes the hash of the fully encoded EIP-712 message for the domain, which can be used to recover the signer
+    /// @dev computes the hash of the fully encoded EIP-712 message for the domain, which can be used to recover the signer
+    /// @param _permit The permit struct
+    /// @return bytes32 The hash of the fully encoded EIP-712 message for the domain
     function getTypedDataHash(Permit memory _permit)
         public
         view
@@ -134,6 +151,8 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
             );
     }
 
+    /// @notice mints multiple rewards for multiple users
+    /// @param params The array of ClaimParams
     function airdrop(ClaimParams[] memory params) public onlyOwner {
         uint256 len = params.length;
         for (uint256 i = 0; i < len; ++i) {
@@ -148,6 +167,9 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         }
     }
 
+    /// @notice returns the URI for a given token ID
+    /// @param tokenId The token ID to get the URI for
+    /// @return string The URI for the given token ID
     function tokenURI(uint256 tokenId)
         public
         view
@@ -175,7 +197,9 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
                 );
     }
 
-    ///@dev used for changing rewardId associated to some tokens
+    ///@notice used for changing rewardId associated to some tokens
+    ///@param winnerIds the tokenIds to change
+    ///@param rewardId the new rewardId
     function award(uint256[] memory winnerIds, uint256 rewardId)
         public
         onlyOwner
@@ -185,6 +209,22 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         }
     }
 
+    /// @dev override the transfer function to allow transfers only if not soulbound
+    /// @param from The address to transfer from
+    /// @param to The address to transfer to
+    /// @param tokenId The token ID to transfer
+    function _transfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
+        if (isSoulbound) revert NotTransferrable();
+        super._transfer(from, to, tokenId);
+    }
+
+    /// @dev internal function to mint a reward for a user
+    /// @param user The user to mint the reward for
+    /// @param rewardId The rewardId to mint
     function _mintReward(address user, uint256 rewardId) internal {
         _safeMint(user, ++lastId);
         tokenIdToRewardId[lastId] = rewardId;
@@ -192,7 +232,8 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         emit Claimed(user, lastId, rewardId);
     }
 
-    ///@dev use ERC2771Context to get sender and data
+    ///@dev use ERC2771Context to get msg data
+    ///@return bytes calldata
     function _msgData()
         internal
         view
@@ -202,6 +243,8 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         return ERC2771Context._msgData();
     }
 
+    ///@dev use ERC2771Context to get msg sender
+    ///@return address sender
     function _msgSender()
         internal
         view
@@ -211,6 +254,8 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
         return ERC2771Context._msgSender();
     }
 
+    /// @dev returns the domain separator for the contract
+    /// @return bytes32 The domain separator for the contract
     function _computeDomainSeparator() internal view virtual returns (bytes32) {
         return
             keccak256(
@@ -226,7 +271,9 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
             );
     }
 
-    // computes the hash of a permit
+    /// @dev computes the hash of a permit struct
+    /// @param _permit The permit struct
+    /// @return bytes32 The hash of the permit struct
     function _getStructHash(Permit memory _permit)
         internal
         view
@@ -243,7 +290,9 @@ contract WaveContract is ERC2771Context, Ownable, ERC721 {
             );
     }
 
-    // Builds a prefixed hash to mimic the behavior of eth_sign.
+    /// @dev Builds a prefixed hash to mimic the behavior of eth_sign.
+    /// @param hash The hash to prefix
+    /// @return bytes32 The prefixed hash
     function _prefixed(bytes32 hash) internal pure returns (bytes32) {
         return
             keccak256(

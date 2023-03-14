@@ -3,7 +3,7 @@ export const TIDE_KEEPER = "0x607291c9b3b03d8c2dc1f5f7f8db2b6a06c91183";
 
 export const TRUSTED_FORWARDERS = {
   1: "",
-  10: "",
-  137: "",
-  42161: "",
+  10: "0x61ea47c9f2d33eb8283e48776794f30a52c92a0b",
+  137: "0x564e4ea0827add5be840953b6d24312ceaf43b44",
+  42161: "0x0f35208fcf76ca76fade7580dae0f33444a054a9",
 };
