@@ -72,7 +72,7 @@ const hardhat: HardhatUserConfig = {
       accounts: [process.env.PVTKEY || ""],
     },
     mainnet: {
-      url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+      url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_KEY}`,
       accounts: [process.env.PVTKEY || ""],
     },
     optimism: {
